@@ -5,14 +5,14 @@ require 'yast-rake-tasks/version'
 Gem::Specification.new do |gem|
   gem.name          = "yast-rake-tasks"
   gem.version       = Yast::Rake::Tasks::VERSION
-  gem.authors       = ["Vladimir Moravec"]
-  gem.email         = ["vmoravec@suse.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.authors       = ["The YaST Team"]
+  gem.email         = ["yast-devel@opensuse.org"]
+  gem.description   = %q{Shared Rake tasks for YaST}
+  gem.summary       = %q{Rake tasks for YaST development}
+  gem.homepage      = "https://github.com/yast/yast-rake-tasks"
 
-  gem.files         = `git ls-files`.split($/)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
+  gem.files         = Dir["lib/**/*.{rake,rb}",'Rakefile','LICENSE','VERSION']
   gem.require_paths = ["lib"]
+
+  gem.add_dependency 'rake'
 end
