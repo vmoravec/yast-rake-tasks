@@ -1,0 +1,2 @@
+namespace :osc do
+end
