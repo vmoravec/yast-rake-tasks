@@ -6,19 +6,15 @@ require 'yast/rake/options/git'
 module Yast
   module Rake
     module Options
-      def self.get
-        @options ||= OptionsProxy.new
+      def self.options
+        @options ||= Proxy.new
       end
 
-      class OptionsProxy
+      class Proxy
         include Base
         include Package
         include Git
         include Obs
-
-        def options
-          self
-        end
       end
     end
   end

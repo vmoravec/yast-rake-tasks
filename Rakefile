@@ -3,7 +3,5 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'yast/rake'
 
-puts rake.options.root
-
 task :default => :package
 

@@ -5,7 +5,7 @@ module Yast
   module Rake
 
     def rake
-      @rake ||= Options.get
+      @rake ||= Options
     end
 
   end
