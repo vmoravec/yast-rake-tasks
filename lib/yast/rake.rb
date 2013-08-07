@@ -1,6 +1,5 @@
 module Yast
   module Rake
-    puts
     module Paths
       YAST_INSTALL_DIR = '/usr/share/YaST2/'
       YAST_DESKTOP_DIR = '/usr/share/applications/YaST2/'
@@ -16,3 +15,5 @@ module Yast
     end
   end
 end
+
+require 'yast/rake/tasks'

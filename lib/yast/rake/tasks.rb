@@ -1,4 +1,3 @@
-require 'yast/rake'
 require 'pathname'
 
 module Yast
