@@ -1,20 +1,17 @@
-require 'pathname'
-
 module Yast
   module Rake
     module Tasks
-      version_file = File.expand_path('../../../../VERSION', __FILE__)
-      VERSION   = File.read(version_file).strip
       TASKS_DIR = Pathname.new(File.dirname(__FILE__)).join 'tasks'
 
-      def self.version
-        VERSION
-      end
-
-      def self.import *tasks
+      def self.import tasks=[]
+        tasks = list if tasks.empty?
         tasks.each do |rake_task|
           ::Rake.application.add_import discover_task(rake_task)
         end
+      end
+
+      def self.list
+        Dir.glob("#{TASKS_DIR}/*.rake").map {|task| File.basename(task, '.rake') }
       end
 
       private
