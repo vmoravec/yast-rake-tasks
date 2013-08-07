@@ -1,10 +1,10 @@
-module Yast::Rake
+module Yast::Rake::Options
   module Obs
     def obs
-      @obs ||= Attributes.new
+      @obs ||= Options.new
     end
 
-    class Attributes
+    class Options
       def url
       end
 
