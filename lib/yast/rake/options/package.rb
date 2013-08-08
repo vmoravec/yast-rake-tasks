@@ -1,13 +1,11 @@
 module Yast::Rake::Options
   module Package
-
     def package
-      @package ||= Attributes.new self # self is needed for accessing other rake configs
+      @package ||= PackageDetails.new self # self is needed for accessing other rake configs
     end
 
-    class Attributes
-
-      attr_reader :version, :name, :maintainer
+    class PackageDetails
+      attr_reader :version, :name, :maintainer, :rake
 
       def initialize rake_scope
         @rake    = rake_scope
@@ -18,12 +16,12 @@ module Yast::Rake::Options
       private
 
       def read_version_file
-        file = @rake.root.join 'VERSION'
+        file = @rake.options.root.join 'VERSION'
         read_content(file) if file_exists?(file)
       end
 
       def read_rpmname_file
-        file = @rake.root.join 'RPMNAME'
+        file = @rake.options.root.join 'RPMNAME'
         read_content(file) if file_exists?(file)
       end
 

@@ -15,7 +15,12 @@ module Yast
         include Package
         include Git
         include Obs
+
+        def options
+          self
+        end
       end
+
     end
   end
 end
