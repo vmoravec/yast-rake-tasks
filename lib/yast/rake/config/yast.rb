@@ -1,6 +1,6 @@
 module Yast
   module Rake
-    module Options
+    module Config
       module Yast
         INSTALL_DIR = '/usr/share/YaST2/'
         CLIENTS_DIR = INSTALL_DIR + 'clients/'
@@ -26,11 +26,11 @@ module Yast
         end
 
         def package_dir
-          rake.options.root.join PACKAGE_DIR
+          rake.config.root.join PACKAGE_DIR
         end
 
         def license_dir
-          rake.options.root.join LICENCE_DIR
+          rake.config.root.join LICENCE_DIR
         end
 
         def tasks

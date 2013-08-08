@@ -1,11 +1,11 @@
 require 'pathname'
-require 'yast/rake/options'
+require 'yast/rake/config'
 
 module Yast
   module Rake
 
     def rake
-      @rake ||= Options
+      Config.load
     end
 
   end
@@ -16,6 +16,7 @@ end
 self.extend Yast::Rake
 
 # needed for the default.rake task to record tasks metadata
+# must be set before loading the tasks
 Rake::TaskManager.record_task_metadata = true
 
 require 'yast/rake/tasks'

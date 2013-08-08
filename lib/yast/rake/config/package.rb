@@ -1,4 +1,4 @@
-module Yast::Rake::Options
+module Yast::Rake::Config
   module Package
     TARGET_DIR  = 'package/'
     LICENSE_DIR = 'license/'
@@ -25,23 +25,19 @@ module Yast::Rake::Options
       ]
     end
 
-    def self.extended(settings)
-      settings.setup
-    end
-
     attr_reader   :version, :name, :maintainer, :excluded_files
     attr_accessor :domain
 
     def setup
-   #  @version = read_version_file
-   #  @name    = read_rpmname_file
+      @version = read_version_file
+      @name    = read_rpmname_file
       @excluded_files = []
       @files   = Files.new
       @domain  = domain_from_rpmname_file
     end
 
     def exclude_file path
-      @excluded_files << options.root.join(path)
+      @excluded_files << rake.config.root.join(path)
     end
 
     def inspect
@@ -51,12 +47,12 @@ module Yast::Rake::Options
     private
 
     def read_version_file
-      file = rake.options.root.join 'VERSION'
+      file = rake.root.join 'VERSION'
       read_content(file) if file_exists?(file)
     end
 
     def read_rpmname_file
-      file = rake.options.root.join 'RPMNAME'
+      file = rake.root.join 'RPMNAME'
       read_content(file) if file_exists?(file)
     end
 
