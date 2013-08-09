@@ -63,13 +63,13 @@ module Yast
         end
 
         def add_config_context config_name, config_module
-          new_context = Context.new(self,config_name).extend(config_module)
+          new_context = Context.new(config_name, self).extend(config_module)
           @contexts[config_name] = new_context
           add_context_method(config_name)
         end
 
         def add_base_config_context context_name, config_module
-          new_context = Context.new(self,context_name).extend(config_module)
+          new_context = Context.new(context_name, self).extend(config_module)
           @contexts[context_name] = new_context
           add_base_context_method(context_name)
         end
@@ -78,6 +78,8 @@ module Yast
           define_singleton_method(context_name) { @contexts[context_name] }
         end
 
+        #TODO add arity when sending the method call
+        #     currently are supported only methods without args
         def add_base_context_method context_name
           define_singleton_method(context_name) do
             @contexts[context_name].__send__(context_name)
@@ -87,7 +89,7 @@ module Yast
         class Context
           attr_reader :config, :context_name, :errors
 
-          def initialize config, context_name
+          def initialize context_name, config
             @errors = []
             @config = config
             @context_name = context_name
@@ -96,7 +98,8 @@ module Yast
           end
 
           def extend config_module
-            @config_methods.concat(config_module.public_instance_methods)
+            @extended_methods = config_module.public_instance_methods
+            @config_methods.concat(@extended_methods)
             super
             setup if respond_to?(:setup)
             report_errors
@@ -104,7 +107,7 @@ module Yast
           end
 
           def inspect
-            @config_methods.to_a
+            @extended_methods.to_a
           end
 
           def report_errors force_report=false
@@ -116,21 +119,17 @@ module Yast
             @errors_reported = true
           end
 
-          def abort
-            Kernel.abort "Aborting rake due to #{errors.size} #{errors.one? ? 'error' : 'errors'}."
-          end
-
           def rake
             config
           end
 
           def check
-            report_errors true
+            report_errors
           end
 
           def check!
             report_errors
-            self.abort
+            Kernel.abort "Found #{errors.size} #{errors.one? ? 'error' : 'errors'}."
           end
 
         end

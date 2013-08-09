@@ -2,8 +2,8 @@ namespace :check do
 
   desc "Default task for rake:check"
   task :all do
-    Rake::Task['check:syntax'].invoke
     Rake::Task['check:package'].invoke
+    Rake::Task['check:syntax'].invoke
   end
 
   desc "Check syntax of *.{rb,rake} files"
@@ -17,9 +17,9 @@ namespace :check do
 
   desc "Check package code completness"
   task :package do
-    rake.config.package.run_checks
+    rake.config.package.check
+    puts # empty line
   end
-
 
   desc "Docs for check task"
   task :help do

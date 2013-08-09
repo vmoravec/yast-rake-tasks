@@ -1,8 +1,8 @@
 module Yast::Rake::Config
   module Package
+    PREFIX      = 'yast-'
     TARGET_DIR  = 'package/'
     LICENSE_DIR = 'license/'
-    PREFIX      = 'yast-'
 
     class Files
       INSTALL = [
@@ -23,25 +23,53 @@ module Yast::Rake::Config
         'coverage/',
         'doc/'
       ]
+
+      attr_reader :rake
+
+      def initialize rake
+        @rake = rake
+      end
+
+      def all
+        Dir["#{rake.config.root}/**/*"]
+      end
+
+      def desktop
+        Dir["#{rake.config.root.join '/src/desktop'}"]
+      end
+
+      def clients
+      end
+
+      def config
+      end
+
+      def modules
+      end
+
+      def test
+      end
+
+      def src
+      end
+
+      def package
+      end
     end
 
-    attr_reader   :version, :name, :maintainer, :excluded_files, :errors
+    attr_reader   :version, :name, :maintainer, :files
     attr_accessor :domain
 
     def setup
       @version = read_version_file
       @name    = read_rpmname_file
       @excluded_files = []
-      @files   = Files.new
+      @files   = Files.new(rake)
       @domain  = domain_from_rpmname_file
     end
 
     def exclude_file path
       @excluded_files << rake.config.root.join(path)
-    end
-
-    def inspect
-      "[ #{(public_methods(false) - [:inspect]).join ', '} ]"
     end
 
     private
