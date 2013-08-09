@@ -1,9 +1,15 @@
 namespace :check do
 
+  desc "Default task for rake:check"
+  task :all do
+    Rake::Task['check:syntax'].invoke
+    Rake::Task['check:package'].invoke
+  end
+
   desc "Check syntax of *.{rb,rake} files"
   task :syntax do
     ok_message_offset = " " * 100
-    Dir["#{rake.options.root}/**/*.{rb,rake}"].each do |file|
+    Dir["#{rake.config.root}/**/*.{rb,rake}"].each do |file|
       print "   #{file}#{ok_message_offset[0..(ok_message_offset.size - file.to_s.size)]}"
       system "ruby -wc #{file}"
     end
@@ -11,9 +17,14 @@ namespace :check do
 
   desc "Check package code completness"
   task :package do
-    rake.options.package
-    puts "Done. Code for package #{rake.options.package.name} seems to be all set."
+    rake.config.package.run_checks
   end
 
-  task :default => :package
+
+  desc "Docs for check task"
+  task :help do
+    puts "Empty docs so far"
+  end
 end
+
+task :check => 'check:all'

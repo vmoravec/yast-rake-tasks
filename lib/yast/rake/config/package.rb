@@ -25,7 +25,7 @@ module Yast::Rake::Config
       ]
     end
 
-    attr_reader   :version, :name, :maintainer, :excluded_files
+    attr_reader   :version, :name, :maintainer, :excluded_files, :errors
     attr_accessor :domain
 
     def setup
@@ -47,13 +47,22 @@ module Yast::Rake::Config
     private
 
     def read_version_file
-      file = rake.root.join 'VERSION'
-      read_content(file) if file_exists?(file)
+      file_path = rake.config.root.join 'VERSION'
+      read_file(file_path)
+    end
+
+    def read_file file
+      if File.exists?(file)
+        read_content(file)
+      else
+        errors << "Mandatory file '#{file}' not found."
+        nil
+      end
     end
 
     def read_rpmname_file
-      file = rake.root.join 'RPMNAME'
-      read_content(file) if file_exists?(file)
+      file_path = rake.config.root.join 'RPMNAME'
+      read_file(file_path)
     end
 
     def domain_from_rpmname_file
@@ -65,15 +74,9 @@ module Yast::Rake::Config
     def read_spec_file       ; end
     def read_changes_file    ; end
 
-    def file_exists? file
-      abort "File '#{file}' is mandatory, please update your code." +
-            "\nAborting rake.." unless File.exists?(file)
-      true
-    end
-
     def read_content file
       content = File.read(file).strip
-      abort "File '#{file}' must not be empty.\nAborting rake.." if content.size.zero?
+      errors.push("File '#{file}' must not be empty.\nAborting rake..") if content.size.zero?
       content
     end
   end

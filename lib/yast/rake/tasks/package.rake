@@ -1,9 +1,9 @@
 namespace :package do
   desc "Information about the package"
   task :info do
-    puts rake.options.package.name
-    puts rake.options.package.version
-    puts rake.options.package.maintainer
+    puts rake.config.package.name
+    puts rake.config.package.version
+    puts rake.config.package.maintainer
   end
 
   desc "Create a package"
