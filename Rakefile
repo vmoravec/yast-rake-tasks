@@ -3,15 +3,9 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 require 'yast/rake'
 
-module Hello
+require_relative 'rake/config/gem'
 
-  def setup
-    @test = 'test'
-  end
+rake.config.register Yast::Rake::Config::Gem
 
-  attr_accessor :test
-
-
-end
-
-rake.config.register Hello, false
+import 'rake/tasks/build.rake'
+import 'rake/tasks/install.rake'

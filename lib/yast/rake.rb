@@ -1,4 +1,5 @@
 require 'pathname'
+require 'yast/rake/version'
 require 'yast/rake/config'
 
 module Yast

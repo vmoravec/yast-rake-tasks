@@ -35,8 +35,8 @@ module Yast
           register Package
         end
 
-        def register config_module, keep_module_namespace=true
-          if keep_module_namespace
+        def register config_module, keep_module_name=true
+          if keep_module_name
             config_name = get_downcased_module_name(config_module)
             remove_config_context(config_name)
             add_config_context(config_name, config_module)
@@ -48,12 +48,12 @@ module Yast
           end
         end
 
-        def update config_module
-          config_name = get_downcased_module_name(config_module)
+        def update loaded_module, new_module
+          config_name = get_downcased_module_name(loaded_module)
           if @contexts.member?(config_name)
-            @contexts[config_name].extend(config_module)
+            @contexts[config_name].extend(new_module)
           else
-            add_new_config_context(config_name, config_module)
+            add_new_config_context(config_name, new_module)
           end
         end
 
@@ -100,13 +100,17 @@ module Yast
           @contexts[context_name]
         end
 
-        def method_missing name, *args, &block
-          super
-        rescue => e
-          puts "rake.config.#{name} does not know '#{name}'"
-          puts "Registered contexts: #{@contexts.keys.join ', '}"
-          puts e.backtrace.first
+        def get_downcased_module_name config_module
+          config_module.to_s.split("::").last.downcase.to_sym
         end
+
+      # def method_missing name, *args, &block
+      #   super
+      # rescue => e
+      #   puts "rake.config.#{name} does not know '#{name}'"
+      #   puts "Registered contexts: #{@contexts.keys.join ', '}"
+      #   puts e.backtrace.first
+      # end
 
         class Context
           attr_reader :config, :context_name, :errors
@@ -123,10 +127,10 @@ module Yast
             make_setup_method_private(config_module)
             @extended_methods = config_module.public_instance_methods
             @config_methods.concat(@extended_methods)
-            super                         # keep the Object.extend functionality
-            run_setup
-            report_errors                 # if setup collected errors, show them now
-            self                          # return the extended context
+            super           # keep the Object.extend functionality
+            run_setup       # call the setup method from config module
+            report_errors   # if setup collected errors, show them now
+            self            # return the extended context
           end
 
           def inspect
@@ -164,20 +168,9 @@ module Yast
           end
 
           def run_setup
-            __send__(SETUP_METHOD) if respond_to?(SETUP_METHOD, true)  # call the setup method from config module
+            __send__(SETUP_METHOD) if respond_to?(SETUP_METHOD, true)
           end
 
-          def method_missing name, *args, &block
-            super
-          rescue => e
-            puts "rake.config.#{context_name} does not know '#{name}'"
-            puts e.backtrace.first
-          end
-
-        end
-
-        def get_downcased_module_name config_module
-          config_module.to_s.split("::").last.downcase.to_sym
         end
 
       end
