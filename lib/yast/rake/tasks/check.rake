@@ -6,6 +6,10 @@ namespace :check do
     Rake::Task['check:syntax'].invoke
   end
 
+  task "all:help" do
+    puts "all:help"
+  end
+
   desc "Check syntax of *.{rb,rake} files"
   task :syntax do
     ok_message_offset = " " * 100
@@ -21,7 +25,6 @@ namespace :check do
     puts # empty line
   end
 
-  desc "Docs for check task"
   task :help do
     puts "Empty docs so far"
   end

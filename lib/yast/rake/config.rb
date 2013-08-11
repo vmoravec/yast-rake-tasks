@@ -16,6 +16,14 @@ module Yast
         @config
       end
 
+      def self.method_missing name, *args, &block
+        super
+      rescue => e
+        puts "rake.config does not know '#{name}'"
+        puts e.message
+        puts e.backtrace.first
+      end
+
       class Proxy
         attr_reader :config
 
@@ -42,7 +50,7 @@ module Yast
 
         def update config_module
           config_name = get_downcased_module_name(config_module)
-          if @contexts.member? config_name
+          if @contexts.member?(config_name)
             @contexts[config_name].extend(config_module)
           else
             add_new_config_context(config_name, config_module)
@@ -66,9 +74,13 @@ module Yast
           new_context = Context.new(config_name, self).extend(config_module)
           @contexts[config_name] = new_context
           add_context_method(config_name)
+          @contexts[config_name]
         end
 
+        SETUP_METHOD = :setup
+
         def add_base_config_context context_name, config_module
+          return if context_name == SETUP_METHOD
           new_context = Context.new(context_name, self).extend(config_module)
           @contexts[context_name] = new_context
           add_base_context_method(context_name)
@@ -76,6 +88,7 @@ module Yast
 
         def add_context_method context_name
           define_singleton_method(context_name) { @contexts[context_name] }
+          @contexts[context_name]
         end
 
         #TODO add arity when sending the method call
@@ -84,6 +97,15 @@ module Yast
           define_singleton_method(context_name) do
             @contexts[context_name].__send__(context_name)
           end
+          @contexts[context_name]
+        end
+
+        def method_missing name, *args, &block
+          super
+        rescue => e
+          puts "rake.config.#{name} does not know '#{name}'"
+          puts "Registered contexts: #{@contexts.keys.join ', '}"
+          puts e.backtrace.first
         end
 
         class Context
@@ -98,12 +120,13 @@ module Yast
           end
 
           def extend config_module
+            make_setup_method_private(config_module)
             @extended_methods = config_module.public_instance_methods
             @config_methods.concat(@extended_methods)
-            super
-            setup if respond_to?(:setup)
-            report_errors
-            self
+            super                         # keep the Object.extend functionality
+            run_setup
+            report_errors                 # if setup collected errors, show them now
+            self                          # return the extended context
           end
 
           def inspect
@@ -130,6 +153,25 @@ module Yast
           def check!
             report_errors
             Kernel.abort "Found #{errors.size} #{errors.one? ? 'error' : 'errors'}."
+          end
+
+          private
+
+          def make_setup_method_private config_module
+            if config_module.public_instance_methods.include?(SETUP_METHOD)
+              config_module.__send__(:private, SETUP_METHOD)
+            end
+          end
+
+          def run_setup
+            __send__(SETUP_METHOD) if respond_to?(SETUP_METHOD, true)  # call the setup method from config module
+          end
+
+          def method_missing name, *args, &block
+            super
+          rescue => e
+            puts "rake.config.#{context_name} does not know '#{name}'"
+            puts e.backtrace.first
           end
 
         end
